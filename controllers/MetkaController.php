@@ -22,6 +22,7 @@ class MetkaController extends Controller
 
     public $vertex = []; // Вершины
     public $arrow = []; // Направление стрелок из "А" в "Б"
+    public $arrowGroups = []; // Сгруппированный массив по связям
 
     public function actionIndex()
     {
@@ -39,19 +40,24 @@ class MetkaController extends Controller
                 ->all();
 
         $this->vertex[$index]['metka'] = 0;
+        
+        foreach ($this->arrow as $key => $value) {
+            $this->arrowGroups[$value['a']][] = $value;
+        }
 
         while ($index <= count($this->vertex)) {
             $this->setMetka($index);
             $index++;
         }
-
+//
         debug($this->vertex);
-        debug($this->arrow);
+//        debug($arrowGroups);
+//        debug($this->arrow);
     }
 
     function setMetka($index)
     {
-        foreach ($this->arrow as $key => &$value) {
+        foreach ($this->arrowGroups[$index] as $key => $value) {
             $value['a'] == $index ? $this->vertex[$value['b']]['metka'] = $this->checkMin($this->vertex[$value['b']]['metka'], $this->vertex[$index]['metka'], $value['w']) : false;
         }
         $this->vertex[$index]['chk'] = 1;
