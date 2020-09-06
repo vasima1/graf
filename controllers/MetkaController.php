@@ -55,6 +55,9 @@ class MetkaController extends Controller
 
         $i = 1;
         
+        /**
+         * Проход по вершинам или стоп при отсутствии связей
+         */
         while ($i <= count($this->vertex)) {
             $index = $this->setMetka($index);
             
@@ -71,8 +74,8 @@ class MetkaController extends Controller
     }
 
     /**
-     * Установка меток группе связей от просматриваемой вершины "А" и возврат индекса к следующей ближайщей вершине
-     * @param type $index текущая просматриваемая вершина
+     * Установка меток группе связей от просматриваемой вершины "А" и возврат индекса к следующей ближайшей вершине
+     * @param int $index текущая просматриваемая вершина
      * @return int индекс к следующей ближайщей вершине
      */
     function setMetka($index)
