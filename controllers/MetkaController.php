@@ -11,11 +11,19 @@ use app\models\tables\Vertex;
  *
  * @author user
  */
-function debug($arr)
+
+/**
+ * Отобразить массив на клиент
+ * @param type $arr
+ */
+function debug($arr) 
 {
     echo '<pre class="on">' . print_r($arr, TRUE) . '</pre>';
 }
 
+/**
+ * Устновка меток веса для связей со стартовой вершины
+ */
 class MetkaController extends Controller
 {
 
@@ -26,7 +34,7 @@ class MetkaController extends Controller
 
     public function actionIndex()
     {
-        $index = 2; // Стартовая точка
+        $index = 6; // Стартовая точка
 
         $this->vertex = Vertex::find()
                 ->select('name, chk, metka')
@@ -49,24 +57,24 @@ class MetkaController extends Controller
         
         while ($i <= count($this->vertex)) {
             $index = $this->setMetka($index);
+            
+            if ($index == 0) {
+                break;
+            }
             $i++;
         }
+        echo 'i = ' .$i;
         
-//        $index = $this->setMetka($index);
-//        $index = $this->setMetka($index);
-//        $index = $this->setMetka($index);
-//        $index = $this->setMetka($index);
-//        $index = $this->setMetka($index);
-//        $index = $this->setMetka($index);
-
-
-//        debug($this->group);
-//        echo 'index ' . $index . '<br>';
         debug($this->vertex);
-        debug($this->arrowGroups);
+//        debug($this->arrowGroups);
 //        debug($this->arrow);
     }
 
+    /**
+     * Установка меток группе связей от просматриваемой вершины "А" и возврат индекса к следующей ближайщей вершине
+     * @param type $index текущая просматриваемая вершина
+     * @return int индекс к следующей ближайщей вершине
+     */
     function setMetka($index)
     {
         $group = [];
@@ -76,29 +84,33 @@ class MetkaController extends Controller
             $this->vertex[$value['b']]['chk'] == 0 && !in_array($value['b'], $this->group) ? $group[$value['b']] = $value['w'] : false;
         }
         $this->vertex[$index]['chk'] = 1;
-        $nextIndex = $this->getNextIndex($index, $group);
+        $nextIndex = $this->getNextIndex($group);
         return $nextIndex;
     }
 
+    /**
+     * Сравнение значение метки вершины "Б" и предлагаемого на замену значений
+     * @param int $target текущее значение вершины "Б"
+     * @param int $indexM текущее значение вершины "А"
+     * @param ind $indexW Вес от "А" к "Б"
+     * @return int конечное значение после сравнения
+     */
     function checkMin($target, $indexM, $indexW)
     {
         $target > ($indexM + $indexW) ? $target = ($indexM + $indexW) : false;
         return $target;
     }
 
-    function getNextIndex($index, $group)
+    /**
+     * Получение индекса для слудующей ближайшей вершины
+     * @param array $group новые поступающие элементы связей
+     * @return int
+     */
+    function getNextIndex($group)
     {
 
         if (empty($this->group) and empty($group)) {
-
-            foreach ($this->vertex as $key => $value) {
-
-                if ($value['chk'] == 0) {
-                    $index = $key;
-                    break;
-                }
-            }
-            return $index;
+            return 0;
         } elseif (empty($this->group)) {
             $this->group = $group;
         }
@@ -111,7 +123,7 @@ class MetkaController extends Controller
             return $key;
         } else {
             unset($this->group[$key]);
-            return $this->getNextIndex($index, $group);
+            return $this->getNextIndex($group);
         }
     }
 
